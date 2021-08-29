@@ -707,8 +707,9 @@ float *network_predict_gpu(network net, float *input)
 
     //cudaGraphExec_t instance = (cudaGraphExec_t)net.cuda_graph_exec;
     static cudaGraphExec_t instance;
-
+    printf("NETWORK_PREDICT_GPU\n");
     if ((*net.cuda_graph_ready) == 0) {
+        printf("CUDA GRAPH NOT READY\n");
         static cudaGraph_t graph;
         if (net.use_cuda_graph == 1) {
             int i;
@@ -735,6 +736,7 @@ float *network_predict_gpu(network net, float *input)
         CHECK_CUDA(cudaStreamSynchronize(get_cuda_stream()));
     }
     else {
+        printf("CUDA GRAPH READY\n");
         cudaStream_t stream0 = switch_stream(0);
         //printf(" cudaGraphLaunch \n");
         CHECK_CUDA( cudaGraphLaunch(instance, stream0) );
