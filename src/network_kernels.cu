@@ -707,7 +707,7 @@ float *network_predict_gpu(network net, float *input)
 
     //cudaGraphExec_t instance = (cudaGraphExec_t)net.cuda_graph_exec;
     static cudaGraphExec_t instance;
-    printf("NETWORK_PREDICT_GPU\n");
+    printf("NETWORK_PREDICT_GPU boom\n");
     if ((*net.cuda_graph_ready) == 0) {
         printf("CUDA GRAPH NOT READY\n");
         static cudaGraph_t graph;
