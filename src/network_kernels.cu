@@ -726,6 +726,7 @@ float *network_predict_gpu(network net, float *input)
         forward_network_gpu(net, state);
 
         if (net.use_cuda_graph == 1) {
+          printf("CUDA GRAPH USE\n");
             cudaStream_t stream0 = switch_stream(0);
             CHECK_CUDA(cudaStreamEndCapture(stream0, &graph));
             CHECK_CUDA(cudaGraphInstantiate(&instance, graph, NULL, NULL, 0));
