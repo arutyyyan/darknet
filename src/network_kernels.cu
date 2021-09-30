@@ -75,8 +75,7 @@ int time_comparator(const void *pa, const void *pb)
     if (diff < 0) return 1;
     else if (diff > 0) return -1;
     return 0;
-
-
+}
 
     int errors = 0;
     pthread_barrier_t init_barrier;
@@ -124,6 +123,7 @@ int time_comparator(const void *pa, const void *pb)
         }else{
           CheckError(ret);
 
+          double start_time, end_time;
 
 
           network net = bookkeeping[1].net;
@@ -215,6 +215,7 @@ int time_comparator(const void *pa, const void *pb)
             CheckError(ret);
 
 
+            double start_time, end_time;
             int img_num = *buf_in;
 
             network net = bookkeeping[img_num].net;
@@ -298,7 +299,6 @@ void forward_network_gpu(network net, network_state state)
 {
     static time_benchmark_layers *avg_time_per_layer = NULL;
     static time_benchmark_layers *sorted_avg_time_per_layer = NULL;
-    double start_time, end_time;
 
     input_data temp = {net, state};
     bookkeeping[1] = temp;
