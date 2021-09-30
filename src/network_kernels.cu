@@ -203,7 +203,7 @@ int time_comparator(const void *pa, const void *pb)
 
     	node_t node = *((node_t*)_node);
 
-    	pgm_claim_node1(node)
+    	pgm_claim_node1(node);
     	tabbuf[node.node] = '\0';
 
     	int in_degree = pgm_get_degree_in1(node);
@@ -347,13 +347,13 @@ void forward_network_gpu(network net, network_state state)
     	ring_attr.nr_threshold = sizeof(int);
     	ring_attr.nmemb = 10;
 
-    	CheckError(pgm_init_process_local());
-    	CheckError(pgm_init_graph(&g, "demo"));
+    	pgm_init_process_local();
+    	pgm_init_graph(&g, "demo");
 
-    	CheckError(pgm_init_node(&n0, g, "n0"));
-    	CheckError(pgm_init_node(&n1, g, "n1"));
+    	pgm_init_node(&n0, g, "n0");
+    	pgm_init_node(&n1, g, "n1");
 
-    	CheckError(pgm_init_edge5(&e0_1, n0, n1, "e0_1", &ring_attr));
+    	pgm_init_edge5(&e0_1, n0, n1, "e0_1", &ring_attr);
 
     	pthread_barrier_init(&init_barrier, 0, 1);
     	pthread_create(&t0, 0, thread1, &n0);
