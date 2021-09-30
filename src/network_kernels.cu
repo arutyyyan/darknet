@@ -52,6 +52,16 @@ float * get_network_output_gpu(network net);
 
 
 
+
+
+typedef struct input_data{
+    network net;
+    network_state state;
+} input_data;
+
+input_data bookkeeping[11];
+
+
 typedef struct time_benchmark_layers {
     float time;
     int layer_id, layer_type;
@@ -284,14 +294,14 @@ int time_comparator(const void *pa, const void *pb)
 
 
 
-void forward_network_gpu(int count, input_data* bookkeeping)
+void forward_network_gpu(network net, network_state state)
 {
     static time_benchmark_layers *avg_time_per_layer = NULL;
     static time_benchmark_layers *sorted_avg_time_per_layer = NULL;
     double start_time, end_time;
 
-    network net = bookkeeping[count].net;
-    network_state state = bookkeeping[count].state;
+    input_data temp = {net, state};
+    bookkeeping[1] = temp;
 
     if (net.benchmark_layers) {
         if (!avg_time_per_layer) {
@@ -919,10 +929,8 @@ float *network_predict_gpu(network net, float *input)
 
         cuda_push_array(state.input, net.input_pinned_cpu, size);
 
-        input_data temp = {net, state};
-        bookkeeping[] = temp;
 
-        forward_network_gpu(count, &bookkeeping);
+        forward_network_gpu(net, state);
 
         // if (net.use_cuda_graph == 1) {
         //   printf("CUDA GRAPH USE\n");
