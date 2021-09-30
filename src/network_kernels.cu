@@ -123,6 +123,10 @@ int time_comparator(const void *pa, const void *pb)
         }else{
           CheckError(ret);
 
+
+          network net = bookkeeping[1].net;
+          network_state state = bookkeeping[1].state;
+
           double start_time, end_time;
           static time_benchmark_layers *avg_time_per_layer = NULL;
           static time_benchmark_layers *sorted_avg_time_per_layer = NULL;
@@ -137,8 +141,6 @@ int time_comparator(const void *pa, const void *pb)
           }
 
 
-          network net = bookkeeping[1].net;
-          network_state state = bookkeeping[1].state;
 
           for(int i = 0; i < net.n/2; ++i){
               state.index = i;
@@ -224,6 +226,11 @@ int time_comparator(const void *pa, const void *pb)
           if(TOTAL_ITERATIONS) != 1)
           {
             CheckError(ret);
+
+
+            network net = bookkeeping[img_num].net;
+            network_state state = bookkeeping[img_num].state;
+
             static time_benchmark_layers *avg_time_per_layer = NULL;
             static time_benchmark_layers *sorted_avg_time_per_layer = NULL;
 
@@ -239,8 +246,6 @@ int time_comparator(const void *pa, const void *pb)
             double start_time, end_time;
             int img_num = *buf_in;
 
-            network net = bookkeeping[img_num].net;
-            network_state state = bookkeeping[img_num].state;
             printf("thread 2 %d\n", *buf_in);
 
             fprintf(stdout, "%s%d fires. read:%d\n", tabbuf, node.node, *buf_in);
