@@ -206,7 +206,7 @@ int time_comparator(const void *pa, const void *pb)
 
 
             int img_num = *buf_in;
-            
+
             network net = bookkeeping[img_num].net;
             network_state state = bookkeeping[img_num].state;
             printf("thread 2 %d\n", *buf_in);
@@ -885,7 +885,7 @@ float *get_network_output_gpu(network net)
     return get_network_output_layer_gpu(net, i);
 }
 
-float *network_predict_gpu(network net, float *input, int count)
+float *network_predict_gpu(network net, float *input)
 {
     if (net.gpu_index != cuda_get_device())
         cuda_set_device(net.gpu_index);
@@ -920,7 +920,7 @@ float *network_predict_gpu(network net, float *input, int count)
         cuda_push_array(state.input, net.input_pinned_cpu, size);
 
         input_data temp = {net, state};
-        bookkeeping[count] = temp;
+        bookkeeping[] = temp;
 
         forward_network_gpu(count, &bookkeeping);
 
