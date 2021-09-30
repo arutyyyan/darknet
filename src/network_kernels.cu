@@ -179,14 +179,14 @@ int time_comparator(const void *pa, const void *pb)
 
 
     			*buf_out = 1;
-          pgm_complete(node)
+          pgm_complete(node);
 
         }
     	}
 
     	pthread_barrier_wait(&init_barrier);
 
-    pgm_release_node1(node)
+    pgm_release_node1(node);
 
     	free(out_edges);
 
@@ -223,7 +223,7 @@ int time_comparator(const void *pa, const void *pb)
 
     			ret = pgm_wait(node);
 
-          if(TOTAL_ITERATIONS) != 1)
+          if(TOTAL_ITERATIONS != 1)
           {
 
 
