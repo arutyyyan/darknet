@@ -101,7 +101,7 @@ int time_comparator(const void *pa, const void *pb)
 
     	node_t node = *((node_t*)_node);
 
-    	CheckError(pgm_claim_node1(node));
+      pgm_claim_node1(node);
     	tabbuf[node.node] = '\0';
 
     	int out_degree = pgm_get_degree_out1(node);
@@ -119,9 +119,9 @@ int time_comparator(const void *pa, const void *pb)
 
     				fprintf(stdout, "%s%d terminates: sum: %lu\n", tabbuf, node.node);
 
-    				CheckError(pgm_terminate(node));
+    				pgm_terminate(node);
         }else{
-          CheckError(ret);
+
 
 
           network net = bookkeeping[1].net;
@@ -179,14 +179,14 @@ int time_comparator(const void *pa, const void *pb)
 
 
     			*buf_out = 1;
-          CheckError(pgm_complete(node));
+          pgm_complete(node)
 
         }
     	}
 
     	pthread_barrier_wait(&init_barrier);
 
-    	CheckError(pgm_release_node1(node));
+    pgm_release_node1(node)
 
     	free(out_edges);
 
@@ -203,7 +203,7 @@ int time_comparator(const void *pa, const void *pb)
 
     	node_t node = *((node_t*)_node);
 
-    	CheckError(pgm_claim_node1(node));
+    	pgm_claim_node1(node)
     	tabbuf[node.node] = '\0';
 
     	int in_degree = pgm_get_degree_in1(node);
@@ -225,9 +225,12 @@ int time_comparator(const void *pa, const void *pb)
 
           if(TOTAL_ITERATIONS) != 1)
           {
-            CheckError(ret);
 
 
+
+            double start_time, end_time;
+
+            int img_num = *buf_in;
             network net = bookkeeping[img_num].net;
             network_state state = bookkeeping[img_num].state;
 
@@ -243,8 +246,6 @@ int time_comparator(const void *pa, const void *pb)
                 cudaDeviceSynchronize();
             }
 
-            double start_time, end_time;
-            int img_num = *buf_in;
 
             printf("thread 2 %d\n", *buf_in);
 
@@ -297,7 +298,7 @@ int time_comparator(const void *pa, const void *pb)
                   }
               }
 
-            CheckError(pgm_complete(node));
+            pgm_complete(node);
 
           }
           else
@@ -311,7 +312,7 @@ int time_comparator(const void *pa, const void *pb)
 
     	pthread_barrier_wait(&init_barrier);
 
-    	CheckError(pgm_release_node1(node));
+    	pgm_release_node1(node);
 
 
     	free(in_edges);
