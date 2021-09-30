@@ -36,7 +36,7 @@
 //#include <opencv2/highgui/highgui_c.h>
 //#endif
 
-#include "http_stream.h
+#include "http_stream.h"
 
 #include <unistd.h>
 #include <errno.h>
