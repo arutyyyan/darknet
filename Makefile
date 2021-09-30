@@ -76,7 +76,7 @@ endif
 CPP=g++ -std=c++11
 NVCC=nvcc
 OPTS=-Ofast
-LDFLAGS= -lm -pthread -lrt
+LDFLAGS= -lm -pthread -lrt -lboost_filesystem -lboost_system
 COMMON= -Iinclude/ -I3rdparty/stb/include
 CFLAGS=-Wall -Wfatal-errors -Wno-unused-result -Wno-unknown-pragmas -fPIC
 
