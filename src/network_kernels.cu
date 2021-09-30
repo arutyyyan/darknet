@@ -292,7 +292,7 @@ int time_comparator(const void *pa, const void *pb)
               if (net.benchmark_layers) {
                   printf("\n\nSorted by time (forward):\n");
                   qsort(sorted_avg_time_per_layer, net.n, sizeof(time_benchmark_layers), time_comparator);
-                  for (int i = 0; i < net->n; ++i) {
+                  for (int i = 0; i <= net.n-1; ++i) {
                       //printf("layer %d - type: %d - avg_time %lf ms \n", avg_time_per_layer[i].layer_id, avg_time_per_layer[i].layer_type, avg_time_per_layer[i].time);
                       printf("%d - fw-sort-layer %d - type: %d - avg_time %lf ms \n", i, sorted_avg_time_per_layer[i].layer_id, sorted_avg_time_per_layer[i].layer_type, sorted_avg_time_per_layer[i].time);
                   }
