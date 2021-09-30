@@ -105,6 +105,14 @@ void update_network_gpu(network net);
 void forward_backward_network_gpu(network net, float *x, float *y);
 #endif
 
+
+typedef struct input_data{
+    network net;
+    network_state state;
+} input_data;
+
+input_data bookkeeping[11];
+
 float get_current_seq_subdivisions(network net);
 int get_sequence_value(network net);
 float get_current_rate(network net);

@@ -758,10 +758,11 @@ float *network_predict_ptr(network *net, float *input)
     return network_predict(*net, input);
 }
 
-float *network_predict(network net, float *input)
+
+float *network_predict(network net, float *input, int count)
 {
 #ifdef GPU
-    if(gpu_index >= 0)  return network_predict_gpu(net, input);
+    if(gpu_index >= 0)  return network_predict_gpu(net, input, count);
 #endif
 
     network_state state = {0};

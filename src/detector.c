@@ -1642,8 +1642,10 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
     }
     int j;
     float nms = .45;    // 0.4F
+    int count = 0;
     while (1) {
         if (filename) {
+            count++;
             strncpy(input, filename, 256);
             if (strlen(input) > 0)
                 if (input[strlen(input) - 1] == 0x0d) input[strlen(input) - 1] = 0;
@@ -1680,7 +1682,7 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
 
         //time= what_time_is_it_now();
         double time = get_time_point();
-        network_predict(net, X);
+        network_predict(net, X, count);
         //network_predict_image(&net, im); letterbox = 1;
         printf("%s: Predicted in %lf milli-seconds.\n", input, ((double)get_time_point() - time) / 1000);
         //printf("%s: Predicted in %f seconds.\n", input, (what_time_is_it_now()-time));
