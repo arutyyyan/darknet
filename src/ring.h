@@ -55,6 +55,8 @@ typedef enum
 	SLOT_READY
 } slot_state_t;
 
+#define typeof(x) __typeof__(x)
+
 struct ring
 {
 	size_t nmemb;
