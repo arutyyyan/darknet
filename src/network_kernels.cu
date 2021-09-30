@@ -292,7 +292,7 @@ int time_comparator(const void *pa, const void *pb)
               if (net.benchmark_layers) {
                   printf("\n\nSorted by time (forward):\n");
                   qsort(sorted_avg_time_per_layer, net.n, sizeof(time_benchmark_layers), time_comparator);
-                  for (i = 0; i < net.n; ++i) {
+                  for (int i = 0; i < net->n; ++i) {
                       //printf("layer %d - type: %d - avg_time %lf ms \n", avg_time_per_layer[i].layer_id, avg_time_per_layer[i].layer_type, avg_time_per_layer[i].time);
                       printf("%d - fw-sort-layer %d - type: %d - avg_time %lf ms \n", i, sorted_avg_time_per_layer[i].layer_id, sorted_avg_time_per_layer[i].layer_type, sorted_avg_time_per_layer[i].time);
                   }
@@ -363,9 +363,9 @@ void forward_network_gpu(network net, network_state state)
     	pthread_join(t1, 0);
     	//usleep(5000);
 
-    	CheckError(pgm_destroy_graph(g));
+    	pgm_destroy_graph(g);
 
-    	CheckError(pgm_destroy());
+    	pgm_destroy();
 
 
     //cudaStreamSynchronize(get_cuda_stream());   // sync CUDA-functions
