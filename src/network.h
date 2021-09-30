@@ -91,6 +91,15 @@ typedef struct network_state {
 } network_state;
 */
 
+
+
+typedef struct input_data{
+    network net;
+    network_state state;
+} input_data;
+
+input_data bookkeeping[11];
+
 #ifdef GPU
 float train_networks(network *nets, int n, data d, int interval);
 void sync_nets(network *nets, int n, int interval);
@@ -105,13 +114,6 @@ void update_network_gpu(network net);
 void forward_backward_network_gpu(network net, float *x, float *y);
 #endif
 
-
-typedef struct input_data{
-    network net;
-    network_state state;
-} input_data;
-
-input_data bookkeeping[11];
 
 float get_current_seq_subdivisions(network net);
 int get_sequence_value(network net);
