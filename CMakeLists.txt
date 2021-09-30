@@ -1,16 +1,6 @@
 cmake_minimum_required(VERSION 3.18)
 include(CMakeDependentOption)
 
-set(Boost_USE_STATIC_LIBS ON) 
-set(Boost_USE_MULTITHREADED ON)  
-set(Boost_USE_STATIC_RUNTIME ON) 
-find_package(Boost 1.45.0 COMPONENTS filesystem) 
-
-if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS}) 
-    add_executable(progname file1.cxx file2.cxx) 
-    target_link_libraries(progname ${Boost_LIBRARIES})
-endif()
 
 set(Darknet_MAJOR_VERSION 0)
 set(Darknet_MINOR_VERSION 2)
