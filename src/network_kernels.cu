@@ -124,12 +124,23 @@ int time_comparator(const void *pa, const void *pb)
           CheckError(ret);
 
           double start_time, end_time;
+          static time_benchmark_layers *avg_time_per_layer = NULL;
+          static time_benchmark_layers *sorted_avg_time_per_layer = NULL;
+
+
+          if (net.benchmark_layers) {
+              if (!avg_time_per_layer) {
+                  avg_time_per_layer = (time_benchmark_layers *)calloc(net.n, sizeof(time_benchmark_layers));
+                  sorted_avg_time_per_layer = (time_benchmark_layers *)calloc(net.n, sizeof(time_benchmark_layers));
+              }
+              cudaDeviceSynchronize();
+          }
 
 
           network net = bookkeeping[1].net;
           network_state state = bookkeeping[1].state;
 
-          for(i = 0; i < net.n/2; ++i){
+          for(int i = 0; i < net.n/2; ++i){
               state.index = i;
               layer l = net.layers[i];
               if(l.delta_gpu && state.train){
@@ -213,7 +224,17 @@ int time_comparator(const void *pa, const void *pb)
           if(TOTAL_ITERATIONS) != 1)
           {
             CheckError(ret);
+            static time_benchmark_layers *avg_time_per_layer = NULL;
+            static time_benchmark_layers *sorted_avg_time_per_layer = NULL;
 
+
+            if (net.benchmark_layers) {
+                if (!avg_time_per_layer) {
+                    avg_time_per_layer = (time_benchmark_layers *)calloc(net.n, sizeof(time_benchmark_layers));
+                    sorted_avg_time_per_layer = (time_benchmark_layers *)calloc(net.n, sizeof(time_benchmark_layers));
+                }
+                cudaDeviceSynchronize();
+            }
 
             double start_time, end_time;
             int img_num = *buf_in;
@@ -228,7 +249,7 @@ int time_comparator(const void *pa, const void *pb)
             if(rand()%5 == 0)
               sched_yield();
 
-              for(i = net.n/2; i < net.n; ++i){
+              for(int i = net.n/2; i < net.n; ++i){
                   state.index = i;
                   layer l = net.layers[i];
                   if(l.delta_gpu && state.train){
@@ -297,20 +318,11 @@ int time_comparator(const void *pa, const void *pb)
 
 void forward_network_gpu(network net, network_state state)
 {
-    static time_benchmark_layers *avg_time_per_layer = NULL;
-    static time_benchmark_layers *sorted_avg_time_per_layer = NULL;
 
-    input_data temp = {net, state};
-    bookkeeping[1] = temp;
 
-    if (net.benchmark_layers) {
-        if (!avg_time_per_layer) {
-            avg_time_per_layer = (time_benchmark_layers *)calloc(net.n, sizeof(time_benchmark_layers));
-            sorted_avg_time_per_layer = (time_benchmark_layers *)calloc(net.n, sizeof(time_benchmark_layers));
-        }
-        cudaDeviceSynchronize();
-    }
 
+        input_data temp = {net, state};
+        bookkeeping[1] = temp;
     //printf("\n");
     state.workspace = net.workspace;
     int i;
