@@ -264,8 +264,6 @@ void* thread2(void* _node)
           fprintf(stdout, "%s%d fires. read:%d\n", tabbuf, node.node, *buf_in);
 
                       // slow down the consumer a little bit to induce backlog in token buffer
-          if(rand()%5 == 0)
-            sched_yield();
 
             for(int i = 31; i < net.n; ++i){
                 state.index = i;
