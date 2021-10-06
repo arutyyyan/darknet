@@ -67,6 +67,13 @@ typedef struct time_benchmark_layers {
     int layer_id, layer_type;
 } time_benchmark_layers;
 
+typedef struct time_data{
+    time_benchmark_layers *avg_time_per_layer;
+    time_benchmark_layers *sorted_avg_time_per_layer;
+} time_data;
+
+time_data time_bookkeeping[11];
+
 int time_comparator(const void *pa, const void *pb)
 {
     time_benchmark_layers a = *(time_benchmark_layers *)pa;
@@ -142,7 +149,7 @@ void* thread1(void* _node)
 
 
 
-          for(int i = 0; i < net.n/2; ++i){
+          for(int i = 0; i < 31; ++i){
               state.index = i;
               layer l = net.layers[i];
               if(l.delta_gpu && state.train){
@@ -151,6 +158,7 @@ void* thread1(void* _node)
 
               if (net.benchmark_layers) {
                   start_time = get_time_point();
+                  printf("%d\n", start_time);
               }
 
               l.forward_gpu(l, state);
@@ -168,6 +176,7 @@ void* thread1(void* _node)
                   else avg_time_per_layer[i].time = avg_time_per_layer[i].time * alpha + took_time * (1 - alpha);
 
                   sorted_avg_time_per_layer[i] = avg_time_per_layer[i];
+
                   printf("\n fw-layer %d - type: %d - %lf ms - avg_time %lf ms \n", i, l.type, took_time, avg_time_per_layer[i].time);
               }
 
@@ -254,7 +263,7 @@ void* thread2(void* _node)
           if(rand()%5 == 0)
             sched_yield();
 
-            for(int i = net.n/2; i < net.n; ++i){
+            for(int i = 31; i < net.n; ++i){
                 state.index = i;
                 layer l = net.layers[i];
                 if(l.delta_gpu && state.train){
