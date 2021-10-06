@@ -77,50 +77,50 @@ int time_comparator(const void *pa, const void *pb)
     return 0;
 }
 
-    int errors = 0;
-    pthread_barrier_t init_barrier;
+int errors = 0;
+pthread_barrier_t init_barrier;
 
-    __thread char __errstr[80] = {0};
+__thread char __errstr[80] = {0};
 
-    #define CheckError(e) \
-    do { int __ret = (e); \
-    if(__ret < 0) { \
-    	errors++; \
-    	char* errstr = strerror_r(errno, __errstr, sizeof(errstr)); \
-    	fprintf(stderr, "%lu: Error %d (%s (%d)) @ %s:%s:%d\n",  \
-    		pthread_self(), __ret, errstr, errno, __FILE__, __FUNCTION__, __LINE__); \
-    }}while(0)
+#define CheckError(e) \
+do { int __ret = (e); \
+if(__ret < 0) { \
+    errors++; \
+  	char* errstr = strerror_r(errno, __errstr, sizeof(errstr)); \
+    fprintf(stderr, "%lu: Error %d (%s (%d)) @ %s:%s:%d\n",  \
+    pthread_self(), __ret, errstr, errno, __FILE__, __FUNCTION__, __LINE__); \
+}}while(0)
 
-    int TOTAL_ITERATIONS = 0;
+int TOTAL_ITERATIONS = 0;
 
-    void* thread1(void* _node)
-    {
-    	char tabbuf[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
+void* thread1(void* _node)
+{
+  	char tabbuf[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
 
-    	int ret = 0;
+  	int ret = 0;
+  	node_t node = *((node_t*)_node);
 
-    	node_t node = *((node_t*)_node);
+    int er = pgm_claim_node1(node);
+    printf("%d\n", er);
+  	tabbuf[node.node] = '\0';
 
-      pgm_claim_node1(node);
-    	tabbuf[node.node] = '\0';
-
-    	int out_degree = pgm_get_degree_out1(node);
-    	edge_t* out_edges = (edge_t*)calloc(out_degree, sizeof(edge_t));
-    	int* buf_out;
+  	int out_degree = pgm_get_degree_out1(node);
+  	edge_t* out_edges = (edge_t*)calloc(out_degree, sizeof(edge_t));
+  	int* buf_out;
 
 
-    	buf_out = (int*)pgm_get_edge_buf_p(out_edges[0]);
+  	buf_out = (int*)pgm_get_edge_buf_p(out_edges[0]);
 
-    	pthread_barrier_wait(&init_barrier);
+  	pthread_barrier_wait(&init_barrier);
 
-    	if(!errors)
-    	{
-        if(TOTAL_ITERATIONS == 1){
+  	if(!errors)
+  	{
+      if(TOTAL_ITERATIONS == 1){
 
-    				fprintf(stdout, "%s%d terminates: sum: %lu\n", tabbuf, node.node);
+  				fprintf(stdout, "%s%d terminates: sum: %lu\n", tabbuf, node.node);
 
-    				pgm_terminate(node);
-        }else{
+  				pgm_terminate(node);
+    }else{
 
 
 
@@ -181,144 +181,142 @@ int time_comparator(const void *pa, const void *pb)
     			*buf_out = 1;
           pgm_complete(node);
 
-        }
-    	}
+      }
+  	}
 
-    	pthread_barrier_wait(&init_barrier);
+  	pthread_barrier_wait(&init_barrier);
 
     pgm_release_node1(node);
 
-    	free(out_edges);
-
-    	pthread_exit(0);
-    }
-
-
-    void* thread2(void* _node)
-    {
-    	char tabbuf[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
-
-    	int ret = 0;
+  	free(out_edges);
+  	pthread_exit(0);
+  }
 
 
-    	node_t node = *((node_t*)_node);
-
-    	pgm_claim_node1(node);
-    	tabbuf[node.node] = '\0';
-
-    	int in_degree = pgm_get_degree_in1(node);
-    	edge_t* in_edges = (edge_t*)calloc(in_degree, sizeof(edge_t));
-
-    	int* buf_in;
-
-    	buf_in = (int*)pgm_get_edge_buf_c(in_edges[0]);
+void* thread2(void* _node)
+{
+  	char tabbuf[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
+  	int ret = 0;
 
 
-    	printf("thread2\n");
+  	node_t node = *((node_t*)_node);
+    int er = pgm_claim_node1(node);
+    printf("%d\n", er);
 
-    	pthread_barrier_wait(&init_barrier);
+  	tabbuf[node.node] = '\0';
 
-    	if(!errors)
-    	{
+  	int in_degree = pgm_get_degree_in1(node);
+  	edge_t* in_edges = (edge_t*)calloc(in_degree, sizeof(edge_t));
 
-    			ret = pgm_wait(node);
+  	int* buf_in;
 
-          if(TOTAL_ITERATIONS != 1)
-          {
-
-
-
-            double start_time, end_time;
-
-            int img_num = *buf_in;
-            network net = bookkeeping[img_num].net;
-            network_state state = bookkeeping[img_num].state;
-
-            static time_benchmark_layers *avg_time_per_layer = NULL;
-            static time_benchmark_layers *sorted_avg_time_per_layer = NULL;
+  	buf_in = (int*)pgm_get_edge_buf_c(in_edges[0]);
 
 
-            if (net.benchmark_layers) {
-                if (!avg_time_per_layer) {
-                    avg_time_per_layer = (time_benchmark_layers *)calloc(net.n, sizeof(time_benchmark_layers));
-                    sorted_avg_time_per_layer = (time_benchmark_layers *)calloc(net.n, sizeof(time_benchmark_layers));
-                }
-                cudaDeviceSynchronize();
-            }
+  	printf("thread2\n");
+
+  	pthread_barrier_wait(&init_barrier);
+
+  	if(!errors)
+  	{
+
+  			ret = pgm_wait(node);
+
+        if(TOTAL_ITERATIONS != 1)
+        {
 
 
-            printf("thread 2 %d\n", *buf_in);
 
-            fprintf(stdout, "%s%d fires. read:%d\n", tabbuf, node.node, *buf_in);
+          double start_time, end_time;
+
+          int img_num = *buf_in;
+          network net = bookkeeping[img_num].net;
+          network_state state = bookkeeping[img_num].state;
+
+          static time_benchmark_layers *avg_time_per_layer = NULL;
+          static time_benchmark_layers *sorted_avg_time_per_layer = NULL;
+
+
+          if (net.benchmark_layers) {
+              if (!avg_time_per_layer) {
+                  avg_time_per_layer = (time_benchmark_layers *)calloc(net.n, sizeof(time_benchmark_layers));
+                  sorted_avg_time_per_layer = (time_benchmark_layers *)calloc(net.n, sizeof(time_benchmark_layers));
+              }
+              cudaDeviceSynchronize();
+          }
+
+
+          printf("thread 2 %d\n", *buf_in);
+
+          fprintf(stdout, "%s%d fires. read:%d\n", tabbuf, node.node, *buf_in);
 
                       // slow down the consumer a little bit to induce backlog in token buffer
-            if(rand()%5 == 0)
-              sched_yield();
+          if(rand()%5 == 0)
+            sched_yield();
 
-              for(int i = net.n/2; i < net.n; ++i){
-                  state.index = i;
-                  layer l = net.layers[i];
-                  if(l.delta_gpu && state.train){
-                      fill_ongpu(l.outputs * l.batch, 0, l.delta_gpu, 1);
-                  }
+            for(int i = net.n/2; i < net.n; ++i){
+                state.index = i;
+                layer l = net.layers[i];
+                if(l.delta_gpu && state.train){
+                    fill_ongpu(l.outputs * l.batch, 0, l.delta_gpu, 1);
+                }
 
-                  if (net.benchmark_layers) {
-                      start_time = get_time_point();
-                  }
+                if (net.benchmark_layers) {
+                    start_time = get_time_point();
+                }
 
-                  l.forward_gpu(l, state);
+                l.forward_gpu(l, state);
 
-                  if (net.benchmark_layers) {
-                      CHECK_CUDA(cudaDeviceSynchronize());
-                      end_time = get_time_point();
-                      const double took_time = (end_time - start_time) / 1000;
-                      const double alpha = 0.9;
-                      if (avg_time_per_layer[i].time == 0) {
-                          avg_time_per_layer[i].layer_id = i;
-                          avg_time_per_layer[i].layer_type = l.type;
-                          avg_time_per_layer[i].time = took_time;
-                      }
-                      else avg_time_per_layer[i].time = avg_time_per_layer[i].time * alpha + took_time * (1 - alpha);
+                if (net.benchmark_layers) {
+                    CHECK_CUDA(cudaDeviceSynchronize());
+                    end_time = get_time_point();
+                    const double took_time = (end_time - start_time) / 1000;
+                    const double alpha = 0.9;
+                    if (avg_time_per_layer[i].time == 0) {
+                        avg_time_per_layer[i].layer_id = i;
+                        avg_time_per_layer[i].layer_type = l.type;
+                        avg_time_per_layer[i].time = took_time;
+                    }
+                    else avg_time_per_layer[i].time = avg_time_per_layer[i].time * alpha + took_time * (1 - alpha);
 
-                      sorted_avg_time_per_layer[i] = avg_time_per_layer[i];
-                      printf("\n fw-layer %d - type: %d - %lf ms - avg_time %lf ms \n", i, l.type, took_time, avg_time_per_layer[i].time);
-                  }
+                    sorted_avg_time_per_layer[i] = avg_time_per_layer[i];
+                    printf("\n fw-layer %d - type: %d - %lf ms - avg_time %lf ms \n", i, l.type, took_time, avg_time_per_layer[i].time);
+                }
 
-                  if(net.wait_stream)
-                      cudaStreamSynchronize(get_cuda_stream());
-                  state.input = l.output_gpu;
-              }
+                if(net.wait_stream)
+                    cudaStreamSynchronize(get_cuda_stream());
+                state.input = l.output_gpu;
+            }
 
-              if (net.benchmark_layers) {
-                  printf("\n\nSorted by time (forward):\n");
-                  qsort(sorted_avg_time_per_layer, net.n, sizeof(time_benchmark_layers), time_comparator);
-                  for (int i = 0; i <= net.n-1; ++i) {
+            if (net.benchmark_layers) {
+                printf("\n\nSorted by time (forward):\n");
+                qsort(sorted_avg_time_per_layer, net.n, sizeof(time_benchmark_layers), time_comparator);
+                for (int i = 0; i <= net.n-1; ++i) {
                       //printf("layer %d - type: %d - avg_time %lf ms \n", avg_time_per_layer[i].layer_id, avg_time_per_layer[i].layer_type, avg_time_per_layer[i].time);
-                      printf("%d - fw-sort-layer %d - type: %d - avg_time %lf ms \n", i, sorted_avg_time_per_layer[i].layer_id, sorted_avg_time_per_layer[i].layer_type, sorted_avg_time_per_layer[i].time);
-                  }
-              }
+                    printf("%d - fw-sort-layer %d - type: %d - avg_time %lf ms \n", i, sorted_avg_time_per_layer[i].layer_id, sorted_avg_time_per_layer[i].layer_type, sorted_avg_time_per_layer[i].time);
+                }
+            }
 
-            pgm_complete(node);
+          pgm_complete(node);
 
-          }
-          else
-          {
-            fprintf(stdout, "%s%d terminates: \n", tabbuf, node.node);
+        }
+        else
+        {
+          fprintf(stdout, "%s%d terminates: \n", tabbuf, node.node);
+        }
 
-          }
-
-    	}
-
-
-    	pthread_barrier_wait(&init_barrier);
-
-    	pgm_release_node1(node);
+  	}
 
 
-    	free(in_edges);
+  	pthread_barrier_wait(&init_barrier);
 
-    	pthread_exit(0);
-    }
+  	pgm_release_node1(node);
+
+
+  	free(in_edges);
+
+  	pthread_exit(0);
+}
 
 
 
@@ -327,8 +325,8 @@ void forward_network_gpu(network net, network_state state)
 
 
 
-        input_data temp = {net, state};
-        bookkeeping[1] = temp;
+    input_data temp = {net, state};
+    bookkeeping[1] = temp;
     //printf("\n");
     state.workspace = net.workspace;
     int i;
