@@ -178,7 +178,7 @@ void* thread1(void* _node)
                   else avg_time_per_layer[i].time = avg_time_per_layer[i].time * alpha + took_time * (1 - alpha);
 
                   sorted_avg_time_per_layer[i] = avg_time_per_layer[i];
-                  sum += avg_time_per_layer[i];
+                  sum += avg_time_per_layer[i].time;
 
                   printf("\n fw-layer %d - type: %d - %lf ms - avg_time %lf ms \n", i, l.type, took_time, avg_time_per_layer[i].time);
               }
