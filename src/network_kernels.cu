@@ -120,84 +120,88 @@ void* thread1(void* _node)
   	buf_out = (int*)pgm_get_edge_buf_p(out_edges[0]);
 
   	pthread_barrier_wait(&init_barrier);
-
+    int cond = 1;
+    int done = 0;
   	if(!errors)
   	{
-      if(TOTAL_ITERATIONS == 1){
+      do{
+        if(done){
 
-  				fprintf(stdout, "%s%d terminates: sum: %lu\n", tabbuf, node.node);
-
-  				pgm_terminate(node);
-    }else{
-
-
-
-          network net = bookkeeping[1].net;
-          network_state state = bookkeeping[1].state;
-
-          double start_time, end_time;
-          static time_benchmark_layers *avg_time_per_layer = NULL;
-          static time_benchmark_layers *sorted_avg_time_per_layer = NULL;
-          int sum = 0;
-
-
-          if (net.benchmark_layers) {
-              if (!avg_time_per_layer) {
-                  avg_time_per_layer = (time_benchmark_layers *)calloc(net.n, sizeof(time_benchmark_layers));
-                  sorted_avg_time_per_layer = (time_benchmark_layers *)calloc(net.n, sizeof(time_benchmark_layers));
-              }
-              cudaDeviceSynchronize();
-          }
+    				fprintf(stdout, "%s%d terminates: sum: %lu\n", tabbuf, node.node);
+            cond = 0;
+    				pgm_terminate(node);
+      }else{
 
 
 
-          for(int i = 0; i < 31; ++i){
-              state.index = i;
-              layer l = net.layers[i];
-              if(l.delta_gpu && state.train){
-                  fill_ongpu(l.outputs * l.batch, 0, l.delta_gpu, 1);
-              }
+            network net = bookkeeping[1].net;
+            network_state state = bookkeeping[1].state;
 
-              if (net.benchmark_layers) {
-                  start_time = get_time_point();
-                  printf("%d\n", start_time);
-              }
-
-              l.forward_gpu(l, state);
-
-              if (net.benchmark_layers) {
-                  CHECK_CUDA(cudaDeviceSynchronize());
-                  end_time = get_time_point();
-                  const double took_time = (end_time - start_time) / 1000;
-                  const double alpha = 0.9;
-                  if (avg_time_per_layer[i].time == 0) {
-                      avg_time_per_layer[i].layer_id = i;
-                      avg_time_per_layer[i].layer_type = l.type;
-                      avg_time_per_layer[i].time = took_time;
-                  }
-                  else avg_time_per_layer[i].time = avg_time_per_layer[i].time * alpha + took_time * (1 - alpha);
-
-                  sorted_avg_time_per_layer[i] = avg_time_per_layer[i];
-                  sum += avg_time_per_layer[i].time;
-
-                  printf("\n fw-layer %d - type: %d - %lf ms - avg_time %lf ms \n", i, l.type, took_time, avg_time_per_layer[i].time);
-              }
-
-              if(net.wait_stream)
-                  cudaStreamSynchronize(get_cuda_stream());
-              state.input = l.output_gpu;
-          }
-
-          if(net.benchmark_layers){
-                time_data time_benchmark = {avg_time_per_layer, sorted_avg_time_per_layer, sum};
-                time_bookkeeping[1] = time_benchmark;
-          }
+            double start_time, end_time;
+            static time_benchmark_layers *avg_time_per_layer = NULL;
+            static time_benchmark_layers *sorted_avg_time_per_layer = NULL;
+            int sum = 0;
 
 
-    			*buf_out = 1;
-          pgm_complete(node);
+            if (net.benchmark_layers) {
+                if (!avg_time_per_layer) {
+                    avg_time_per_layer = (time_benchmark_layers *)calloc(net.n, sizeof(time_benchmark_layers));
+                    sorted_avg_time_per_layer = (time_benchmark_layers *)calloc(net.n, sizeof(time_benchmark_layers));
+                }
+                cudaDeviceSynchronize();
+            }
 
-      }
+
+
+            for(int i = 0; i < 31; ++i){
+                state.index = i;
+                layer l = net.layers[i];
+                if(l.delta_gpu && state.train){
+                    fill_ongpu(l.outputs * l.batch, 0, l.delta_gpu, 1);
+                }
+
+                if (net.benchmark_layers) {
+                    start_time = get_time_point();
+                    printf("%d\n", start_time);
+                }
+
+                l.forward_gpu(l, state);
+
+                if (net.benchmark_layers) {
+                    CHECK_CUDA(cudaDeviceSynchronize());
+                    end_time = get_time_point();
+                    const double took_time = (end_time - start_time) / 1000;
+                    const double alpha = 0.9;
+                    if (avg_time_per_layer[i].time == 0) {
+                        avg_time_per_layer[i].layer_id = i;
+                        avg_time_per_layer[i].layer_type = l.type;
+                        avg_time_per_layer[i].time = took_time;
+                    }
+                    else avg_time_per_layer[i].time = avg_time_per_layer[i].time * alpha + took_time * (1 - alpha);
+
+                    sorted_avg_time_per_layer[i] = avg_time_per_layer[i];
+                    sum += avg_time_per_layer[i].time;
+
+                    printf("\n fw-layer %d - type: %d - %lf ms - avg_time %lf ms \n", i, l.type, took_time, avg_time_per_layer[i].time);
+                }
+
+                if(net.wait_stream)
+                    cudaStreamSynchronize(get_cuda_stream());
+                state.input = l.output_gpu;
+            }
+
+            if(net.benchmark_layers){
+                  time_data time_benchmark = {avg_time_per_layer, sorted_avg_time_per_layer, sum};
+                  time_bookkeeping[1] = time_benchmark;
+            }
+
+            done = 1;
+      			*buf_out = 1;
+            pgm_complete(node);
+
+        }
+      }while(cond);
+
   	}
 
   	pthread_barrier_wait(&init_barrier);
