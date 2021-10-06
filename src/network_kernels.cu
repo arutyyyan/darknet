@@ -70,6 +70,7 @@ typedef struct time_benchmark_layers {
 typedef struct time_data{
     time_benchmark_layers *avg_time_per_layer;
     time_benchmark_layers *sorted_avg_time_per_layer;
+    int sum;
 } time_data;
 
 time_data time_bookkeeping[11];
@@ -137,6 +138,7 @@ void* thread1(void* _node)
           double start_time, end_time;
           static time_benchmark_layers *avg_time_per_layer = NULL;
           static time_benchmark_layers *sorted_avg_time_per_layer = NULL;
+          int sum = 0;
 
 
           if (net.benchmark_layers) {
@@ -176,6 +178,7 @@ void* thread1(void* _node)
                   else avg_time_per_layer[i].time = avg_time_per_layer[i].time * alpha + took_time * (1 - alpha);
 
                   sorted_avg_time_per_layer[i] = avg_time_per_layer[i];
+                  sum += avg_time_per_layer[i];
 
                   printf("\n fw-layer %d - type: %d - %lf ms - avg_time %lf ms \n", i, l.type, took_time, avg_time_per_layer[i].time);
               }
@@ -186,7 +189,7 @@ void* thread1(void* _node)
           }
 
           if(net.benchmark_layers){
-                time_data time_benchmark = {avg_time_per_layer, sorted_avg_time_per_layer};
+                time_data time_benchmark = {avg_time_per_layer, sorted_avg_time_per_layer, sum};
                 time_bookkeeping[1] = time_benchmark;
           }
 
@@ -238,8 +241,6 @@ void* thread2(void* _node)
         if(TOTAL_ITERATIONS != 1)
         {
 
-
-
           double start_time, end_time;
 
           int img_num = *buf_in;
@@ -248,11 +249,12 @@ void* thread2(void* _node)
 
           static time_benchmark_layers *avg_time_per_layer = NULL;
           static time_benchmark_layers *sorted_avg_time_per_layer = NULL;
-
+          int sum = 0;
 
           if (net.benchmark_layers) {
               avg_time_per_layer = time_bookkeeping[img_num].avg_time_per_layer;
               sorted_avg_time_per_layer = time_bookkeeping[img_num].sorted_avg_time_per_layer;
+              sum = time_bookkeeping[img_num].sum;
               cudaDeviceSynchronize();
           }
 
@@ -301,9 +303,9 @@ void* thread2(void* _node)
 
             if (net.benchmark_layers) {
 
-                time_data time_benchmark = {avg_time_per_layer, sorted_avg_time_per_layer};
+                time_data time_benchmark = {avg_time_per_layer, sorted_avg_time_per_layer, sum};
                 time_bookkeeping[1] = time_benchmark;
-                printf("\n\nSorted by time (forward):\n");
+                printf("\n\nSorted by time (forward): sum: %d\n", sum);
                 qsort(sorted_avg_time_per_layer, net.n, sizeof(time_benchmark_layers), time_comparator);
                 for (int i = 0; i <= net.n-1; ++i) {
                       //printf("layer %d - type: %d - avg_time %lf ms \n", avg_time_per_layer[i].layer_id, avg_time_per_layer[i].layer_type, avg_time_per_layer[i].time);
