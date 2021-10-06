@@ -310,7 +310,7 @@ void* thread2(void* _node)
                     printf("%d - fw-sort-layer %d - type: %d - avg_time %lf ms \n", i, sorted_avg_time_per_layer[i].layer_id, sorted_avg_time_per_layer[i].layer_type, sorted_avg_time_per_layer[i].time);
                 }
             }
-
+          TOTAL_ITERATIONS++;
           pgm_complete(node);
 
         }
