@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 include(CMakeDependentOption)
 
+
 set(Darknet_MAJOR_VERSION 0)
 set(Darknet_MINOR_VERSION 2)
 set(Darknet_PATCH_VERSION 5)
