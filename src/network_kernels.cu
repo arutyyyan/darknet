@@ -121,10 +121,12 @@ void* thread1(void* _node)
 
   	pthread_barrier_wait(&init_barrier);
     int cond = 1;
+    int done = 0;
+
   	if(!errors)
   	{
       do{
-        if(TOTAL_ITERATIONS == 1){
+        if(TOTAL_ITERATIONS && done){
 
     				fprintf(stdout, "%s%d terminates: sum: %lu\n", tabbuf, node.node);
             cond = 0;
@@ -193,7 +195,6 @@ void* thread1(void* _node)
                   time_data time_benchmark = {avg_time_per_layer, sorted_avg_time_per_layer, sum};
                   time_bookkeeping[1] = time_benchmark;
             }
-
             done = 1;
       			*buf_out = 1;
             pgm_complete(node);
