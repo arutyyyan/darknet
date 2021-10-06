@@ -370,8 +370,12 @@ void forward_network_gpu(network net, network_state state)
   	pthread_create(&t0, 0, thread1, &n0);
   	pthread_create(&t1, 0, thread2, &n1);
 
+
+    double start_time = get_time_point();
   	pthread_join(t0, 0);
+    printf("(%d)\n", (double)get_time_point() - start_time) / 1000);
   	pthread_join(t1, 0);
+    printf("(%d)\n", (double)get_time_point() - start_time) / 1000);
     	//usleep(5000);
 
   	pgm_destroy_graph(g);
