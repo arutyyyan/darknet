@@ -121,11 +121,10 @@ void* thread1(void* _node)
 
   	pthread_barrier_wait(&init_barrier);
     int cond = 1;
-    int done = 0;
   	if(!errors)
   	{
       do{
-        if(done){
+        if(TOTAL_ITERATIONS == 1){
 
     				fprintf(stdout, "%s%d terminates: sum: %lu\n", tabbuf, node.node);
             cond = 0;
