@@ -185,6 +185,10 @@ void* thread1(void* _node)
               state.input = l.output_gpu;
           }
 
+          if(net.benchmark_layers){
+                time_data time_benchmark = {avg_time_per_layer, sorted_avg_time_per_layer};
+                time_bookkeeping[1] = time_benchmark;
+          }
 
 
     			*buf_out = 1;
@@ -247,10 +251,8 @@ void* thread2(void* _node)
 
 
           if (net.benchmark_layers) {
-              if (!avg_time_per_layer) {
-                  avg_time_per_layer = (time_benchmark_layers *)calloc(net.n, sizeof(time_benchmark_layers));
-                  sorted_avg_time_per_layer = (time_benchmark_layers *)calloc(net.n, sizeof(time_benchmark_layers));
-              }
+              avg_time_per_layer = time_bookkeeping[img_num].avg_time_per_layer;
+              sorted_avg_time_per_layer = time_bookkeeping[img_num].sorted_avg_time_per_layer;
               cudaDeviceSynchronize();
           }
 
@@ -298,6 +300,9 @@ void* thread2(void* _node)
             }
 
             if (net.benchmark_layers) {
+
+                time_data time_benchmark = {avg_time_per_layer, sorted_avg_time_per_layer};
+                time_bookkeeping[1] = time_benchmark;
                 printf("\n\nSorted by time (forward):\n");
                 qsort(sorted_avg_time_per_layer, net.n, sizeof(time_benchmark_layers), time_comparator);
                 for (int i = 0; i <= net.n-1; ++i) {
@@ -333,6 +338,7 @@ void forward_network_gpu(network net, network_state state)
 {
     //printf("\n");
     state.workspace = net.workspace;
+    net.benchmark_layers = 1;
 
     input_data temp = {net, state};
     bookkeeping[1] = temp;
