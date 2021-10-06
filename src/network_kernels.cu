@@ -322,48 +322,46 @@ void* thread2(void* _node)
 
 void forward_network_gpu(network net, network_state state)
 {
-
-
+    //printf("\n");
+    state.workspace = net.workspace;
 
     input_data temp = {net, state};
     bookkeeping[1] = temp;
-    //printf("\n");
-    state.workspace = net.workspace;
     int i;
 
-    	graph_t g;
-    	node_t  n0, n1;
-    	edge_t  e0_1;
+  	graph_t g;
+  	node_t  n0, n1;
+  	edge_t  e0_1;
 
-    	pthread_t t0, t1;
+  	pthread_t t0, t1;
 
-    	edge_attr_t ring_attr;
-    	memset(&ring_attr, 0, sizeof(ring_attr));
-    	ring_attr.type = pgm_ring_edge;
-    	ring_attr.nr_produce = sizeof(int);
-    	ring_attr.nr_consume = sizeof(int);
-    	ring_attr.nr_threshold = sizeof(int);
-    	ring_attr.nmemb = 10;
+  	edge_attr_t ring_attr;
+  	memset(&ring_attr, 0, sizeof(ring_attr));
+  	ring_attr.type = pgm_ring_edge;
+  	ring_attr.nr_produce = sizeof(int);
+  	ring_attr.nr_consume = sizeof(int);
+  	ring_attr.nr_threshold = sizeof(int);
+  	ring_attr.nmemb = 10;
 
-    	pgm_init_process_local();
-    	pgm_init_graph(&g, "demo");
+  	pgm_init_process_local();
+  	pgm_init_graph(&g, "demo");
 
-    	pgm_init_node(&n0, g, "n0");
-    	pgm_init_node(&n1, g, "n1");
+  	pgm_init_node(&n0, g, "n0");
+  	pgm_init_node(&n1, g, "n1");
 
-    	pgm_init_edge5(&e0_1, n0, n1, "e0_1", &ring_attr);
+  	pgm_init_edge5(&e0_1, n0, n1, "e0_1", &ring_attr);
 
-    	pthread_barrier_init(&init_barrier, 0, 1);
-    	pthread_create(&t0, 0, thread1, &n0);
-    	pthread_create(&t1, 0, thread2, &n1);
+  	pthread_barrier_init(&init_barrier, 0, 1);
+  	pthread_create(&t0, 0, thread1, &n0);
+  	pthread_create(&t1, 0, thread2, &n1);
 
-    	pthread_join(t0, 0);
-    	pthread_join(t1, 0);
+  	pthread_join(t0, 0);
+  	pthread_join(t1, 0);
     	//usleep(5000);
 
-    	pgm_destroy_graph(g);
+  	pgm_destroy_graph(g);
 
-    	pgm_destroy();
+  	pgm_destroy();
 
 
     //cudaStreamSynchronize(get_cuda_stream());   // sync CUDA-functions
