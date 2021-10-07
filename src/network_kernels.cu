@@ -198,7 +198,7 @@ void* thread1(void* _node)
             }
             done = 1;
       			*buf_out = 1;
-            printf("thread1 time %d milliseconds\n", ((double)get_time_point() - thread_time)/1000 );
+            printf("thread1 time %lf milliseconds\n", ((double)get_time_point() - thread_time)/1000 );
             pgm_complete(node);
 
         }
@@ -242,11 +242,11 @@ void* thread2(void* _node)
   	if(!errors)
   	{
         double thread2_time_before = get_time_point();
-        printf("thread2 time before pgm_wait() %d milliseconds\n", (thread2_time_before - thread_time)/1000);
+        printf("thread2 time before pgm_wait() %lf milliseconds\n", (thread2_time_before - thread_time)/1000);
 
   			ret = pgm_wait(node);
         double taken_time = get_time_point();
-        printf("time taken for pgm_wait() %d\n", (taken_time - thread2_time_before)/1000);
+        printf("time taken for pgm_wait() %lf\n", (taken_time - thread2_time_before)/1000);
 
         if(TOTAL_ITERATIONS != 1)
         {
@@ -321,8 +321,8 @@ void* thread2(void* _node)
                 }
             }
           TOTAL_ITERATIONS++;
-          printf("before pgm_complete thread 2  %d \n", ((double)get_time_point() - taken_time)/1000);
-          printf("all time thread 2  %d \n", ((double)get_time_point() - thread2_time_before)/1000);
+          printf("before pgm_complete thread 2  %lf \n", ((double)get_time_point() - taken_time)/1000);
+          printf("all time thread 2  %lf \n", ((double)get_time_point() - thread2_time_before)/1000);
           pgm_complete(node);
 
         }
