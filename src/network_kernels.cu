@@ -132,7 +132,7 @@ void* thread1(void* _node)
     				fprintf(stdout, "%s%d terminates: sum: %lu\n", tabbuf, node.node);
             cond = 0;
     				pgm_terminate(node);
-      }else if(!done){
+      }else{
 
 
 
@@ -155,7 +155,7 @@ void* thread1(void* _node)
 
 
 
-            for(int i = 0; i < net.n/2; ++i){
+            for(int i = 0; i < 31; ++i){
                 state.index = i;
                 layer l = net.layers[i];
                 if(l.delta_gpu && state.train){
@@ -275,7 +275,7 @@ void* thread2(void* _node)
 
                       // slow down the consumer a little bit to induce backlog in token buffer
 
-            for(int i = net.n/2; i < net.n; ++i){
+            for(int i = 31; i < net.n; ++i){
                 state.index = i;
                 layer l = net.layers[i];
                 if(l.delta_gpu && state.train){
@@ -387,8 +387,9 @@ void forward_network_gpu(network net, network_state state)
 
     double start_time = get_time_point();
   	pthread_join(t0, 0);
+    printf("forward network gpu after thread 1 join  %lf \n", ((double)get_time_point() - time1)/1000);
   	pthread_join(t1, 0);
-    printf("forward network gpu after thread joins  %lf \n", ((double)get_time_point() - time1)/1000);
+    printf("forward network gpu after thread join  %lf \n", ((double)get_time_point() - time1)/1000);
 
 
   	pgm_destroy_graph(g);
