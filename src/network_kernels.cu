@@ -351,7 +351,7 @@ void forward_network_gpu(network net, network_state state)
     //printf("\n");
     state.workspace = net.workspace;
     net.benchmark_layers = 0;
-    double time1 = ((double)get_time_point();
+    double time1 = (double)get_time_point();
 
     input_data temp = {net, state};
     bookkeeping[1] = temp;
@@ -378,6 +378,8 @@ void forward_network_gpu(network net, network_state state)
   	pgm_init_node(&n1, g, "n1");
 
   	pgm_init_edge5(&e0_1, n0, n1, "e0_1", &ring_attr);
+    printf("forward network gpu after initialization  %lf \n", ((double)get_time_point() - time1)/1000);
+
 
   	pthread_barrier_init(&init_barrier, 0, 1);
   	pthread_create(&t0, 0, thread1, &n0);
