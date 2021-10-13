@@ -321,8 +321,8 @@ void* thread2(void* _node)
                 }
             }
           TOTAL_ITERATIONS++;
-          printf("before pgm_complete thread 2  %lf \n", ((double)get_time_point() - taken_time)/1000);
-          printf("all time thread 2  %lf \n", ((double)get_time_point() - thread2_time_before)/1000);
+          printf("all time thread 2  without pgm_wait %lf \n", ((double)get_time_point() - taken_time)/1000);
+          printf("all time thread 2  %lf \n", ((double)get_time_point() - thread_time)/1000);
           pgm_complete(node);
 
         }
@@ -351,6 +351,7 @@ void forward_network_gpu(network net, network_state state)
     //printf("\n");
     state.workspace = net.workspace;
     net.benchmark_layers = 0;
+    double time1 = ((double)get_time_point();
 
     input_data temp = {net, state};
     bookkeeping[1] = temp;
@@ -386,10 +387,15 @@ void forward_network_gpu(network net, network_state state)
     double start_time = get_time_point();
   	pthread_join(t0, 0);
   	pthread_join(t1, 0);
+    printf("forward network gpu after thread join  %lf \n", ((double)get_time_point() - time1)/1000);
+
 
   	pgm_destroy_graph(g);
 
   	pgm_destroy();
+    printf("forward network gpu after destroy  %lf \n", ((double)get_time_point() - time1)/1000);
+
+
 
 
     //cudaStreamSynchronize(get_cuda_stream());   // sync CUDA-functions
