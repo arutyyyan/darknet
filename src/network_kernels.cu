@@ -382,10 +382,12 @@ void forward_network_gpu(network net, network_state state)
   	pthread_barrier_init(&init_barrier, 0, 1);
   	pthread_create(&t0, 0, thread1, &n0);
   	pthread_create(&t1, 0, thread2, &n1);
+    printf("forward network gpu for initialization  %lf \n", ((double)get_time_point() - time1)/1000);
 
 
     double start_time = get_time_point();
   	pthread_join(t0, 0);
+    printf("forward network gpu after thread 1 join  %lf \n", ((double)get_time_point() - time1)/1000);
   	pthread_join(t1, 0);
     printf("forward network gpu after thread join  %lf \n", ((double)get_time_point() - time1)/1000);
 
