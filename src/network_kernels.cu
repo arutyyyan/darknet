@@ -132,7 +132,7 @@ void* thread1(void* _node)
     				fprintf(stdout, "%s%d terminates: sum: %lu\n", tabbuf, node.node);
             cond = 0;
     				pgm_terminate(node);
-      }else if(!done){
+      }else{
 
 
 
