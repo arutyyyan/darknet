@@ -387,9 +387,8 @@ void forward_network_gpu(network net, network_state state)
 
     double start_time = get_time_point();
   	pthread_join(t0, 0);
-    printf("forward network gpu after thread 1 join  %lf \n", ((double)get_time_point() - time1)/1000);
   	pthread_join(t1, 0);
-    printf("forward network gpu after thread join  %lf \n", ((double)get_time_point() - time1)/1000);
+    printf("forward network gpu after thread joins  %lf \n", ((double)get_time_point() - time1)/1000);
 
 
   	pgm_destroy_graph(g);
