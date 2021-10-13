@@ -351,7 +351,7 @@ void forward_network_gpu(network net, network_state state)
     //printf("\n");
     state.workspace = net.workspace;
     net.benchmark_layers = 0;
-    double time1 = ((double)get_time_point();
+    double time1 = (double)get_time_point();
 
     input_data temp = {net, state};
     bookkeeping[1] = temp;
