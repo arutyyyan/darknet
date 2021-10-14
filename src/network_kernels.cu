@@ -110,7 +110,7 @@ void* thread1(void* _node)
   	node_t node = *((node_t*)_node);
 
     int er = pgm_claim_node1(node);
-    printf("%d\n", er);
+    printf("er %d\n", er);
   	tabbuf[node.node] = '\0';
 
   	int out_degree = pgm_get_degree_out1(node);
@@ -198,7 +198,7 @@ void* thread1(void* _node)
             }
             done = 1;
       			*buf_out = 1;
-            printf("thread1 time %lf milliseconds\n", ((double)get_time_point() - thread_time)/1000 );
+            //printf("thread1 time %lf milliseconds\n", ((double)get_time_point() - thread_time)/1000 );
             pgm_complete(node);
 
         }
@@ -223,7 +223,7 @@ void* thread2(void* _node)
 
   	node_t node = *((node_t*)_node);
     int er = pgm_claim_node1(node);
-    printf("%d\n", er);
+    printf("er %d\n", er);
 
   	tabbuf[node.node] = '\0';
 
@@ -248,11 +248,11 @@ void* thread2(void* _node)
   	if(!errors)
   	{
         double thread2_time_before = get_time_point();
-        printf("thread2 time before pgm_wait() %lf milliseconds\n", (thread2_time_before - thread_time)/1000);
+      //  printf("thread2 time before pgm_wait() %lf milliseconds\n", (thread2_time_before - thread_time)/1000);
 
   			ret = pgm_wait(node);
         double taken_time = get_time_point();
-        printf("time taken for pgm_wait() %lf\n", (taken_time - thread2_time_before)/1000);
+        //printf("time taken for pgm_wait() %lf\n", (taken_time - thread2_time_before)/1000);
 
         if(TOTAL_ITERATIONS != 1)
         {
@@ -327,8 +327,8 @@ void* thread2(void* _node)
                 }
             }
           *buf_out = img_num;
-          printf("all time thread 2  without pgm_wait %lf \n", ((double)get_time_point() - taken_time)/1000);
-          printf("all time thread 2  %lf \n", ((double)get_time_point() - thread_time)/1000);
+          // printf("all time thread 2  without pgm_wait %lf \n", ((double)get_time_point() - taken_time)/1000);
+          // printf("all time thread 2  %lf \n", ((double)get_time_point() - thread_time)/1000);
           pgm_complete(node);
 
         }
@@ -360,7 +360,7 @@ void* thread3(void* _node)
 
   	node_t node = *((node_t*)_node);
     int er = pgm_claim_node1(node);
-    printf("%d\n", er);
+    printf("er %d\n", er);
 
   	tabbuf[node.node] = '\0';
 
