@@ -512,7 +512,7 @@ void forward_network_gpu(network net, network_state state)
 
   	pgm_init_node(&n0, g, "n0");
   	pgm_init_node(&n1, g, "n1");
-  	int err = pgm_init_node(&n1, g, "n2");
+  	int err = pgm_init_node(&n2, g, "n2");
     printf("err init node %d\n", err);
 
   	pgm_init_edge5(&e0_1, n0, n1, "e0_1", &ring_attr);
