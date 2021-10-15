@@ -132,7 +132,7 @@ void* thread1(void* _node)
     				fprintf(stdout, "%s%d terminates: sum: %lu\n", tabbuf, node.node);
             cond = 0;
     				pgm_terminate(node);
-      }else{
+      }else if(!done){
 
 
 
@@ -326,6 +326,7 @@ void* thread2(void* _node)
                     printf("%d - fw-sort-layer %d - type: %d - avg_time %lf ms \n", i, sorted_avg_time_per_layer[i].layer_id, sorted_avg_time_per_layer[i].layer_type, sorted_avg_time_per_layer[i].time);
                 }
             }
+            bookkeeping[img_num] =
           *buf_out = img_num;
           // printf("all time thread 2  without pgm_wait %lf \n", ((double)get_time_point() - taken_time)/1000);
           // printf("all time thread 2  %lf \n", ((double)get_time_point() - thread_time)/1000);
