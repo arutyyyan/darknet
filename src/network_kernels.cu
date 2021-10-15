@@ -110,7 +110,7 @@ void* thread1(void* _node)
   	node_t node = *((node_t*)_node);
 
     int er = pgm_claim_node1(node);
-    printf("%d\n", er);
+    printf("er %d\n", er);
   	tabbuf[node.node] = '\0';
 
   	int out_degree = pgm_get_degree_out1(node);
@@ -223,7 +223,7 @@ void* thread2(void* _node)
 
   	node_t node = *((node_t*)_node);
     int er = pgm_claim_node1(node);
-    printf("%d\n", er);
+    printf("er %d\n", er);
 
   	tabbuf[node.node] = '\0';
 
@@ -360,7 +360,7 @@ void* thread3(void* _node)
 
   	node_t node = *((node_t*)_node);
     int er = pgm_claim_node1(node);
-    printf("%d\n", er);
+    printf("er %d\n", er);
 
   	tabbuf[node.node] = '\0';
 
@@ -512,7 +512,7 @@ void forward_network_gpu(network net, network_state state)
 
   	pgm_init_node(&n0, g, "n0");
   	pgm_init_node(&n1, g, "n1");
-  	pgm_init_node(&n2, g, "n2");
+  	pgm_init_node(&n1, g, "n2");
 
   	pgm_init_edge5(&e0_1, n0, n1, "e0_1", &ring_attr);
     pgm_init_edge5(&e1_2, n1, n2, "e1_2", &ring_attr);
