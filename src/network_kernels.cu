@@ -155,7 +155,7 @@ void* thread1(void* _node)
 
 
 
-            for(int i = 0; i < 31; ++i){
+            for(int i = 0; i < 15; ++i){
                 state.index = i;
                 layer l = net.layers[i];
                 if(l.delta_gpu && state.train){
@@ -198,7 +198,7 @@ void* thread1(void* _node)
             }
             done = 1;
       			*buf_out = 1;
-            printf("thread1 time %lf milliseconds\n", ((double)get_time_point() - thread_time)/1000 );
+            //printf("thread1 time %lf milliseconds\n", ((double)get_time_point() - thread_time)/1000 );
             pgm_complete(node);
 
         }
@@ -234,6 +234,13 @@ void* thread2(void* _node)
 
   	buf_in = (int*)pgm_get_edge_buf_c(in_edges[0]);
 
+    int out_degree = pgm_get_degree_out1(node);
+    edge_t* out_edges = (edge_t*)calloc(out_degree, sizeof(edge_t));
+    int* buf_out;
+
+
+    buf_out = (int*)pgm_get_edge_buf_p(out_edges[0]);
+
 
   	printf("thread2\n");
 
@@ -242,11 +249,11 @@ void* thread2(void* _node)
   	if(!errors)
   	{
         double thread2_time_before = get_time_point();
-        printf("thread2 time before pgm_wait() %lf milliseconds\n", (thread2_time_before - thread_time)/1000);
+      //  printf("thread2 time before pgm_wait() %lf milliseconds\n", (thread2_time_before - thread_time)/1000);
 
   			ret = pgm_wait(node);
         double taken_time = get_time_point();
-        printf("time taken for pgm_wait() %lf\n", (taken_time - thread2_time_before)/1000);
+      //  printf("time taken for pgm_wait() %lf\n", (taken_time - thread2_time_before)/1000);
 
         if(TOTAL_ITERATIONS != 1)
         {
@@ -275,7 +282,7 @@ void* thread2(void* _node)
 
                       // slow down the consumer a little bit to induce backlog in token buffer
 
-            for(int i = 31; i < net.n; ++i){
+            for(int i = 15; i < 30; ++i){
                 state.index = i;
                 layer l = net.layers[i];
                 if(l.delta_gpu && state.train){
@@ -321,8 +328,10 @@ void* thread2(void* _node)
                 }
             }
           TOTAL_ITERATIONS++;
-          printf("all time thread 2  without pgm_wait %lf \n", ((double)get_time_point() - taken_time)/1000);
-          printf("all time thread 2  %lf \n", ((double)get_time_point() - thread_time)/1000);
+        //  printf("all time thread 2  without pgm_wait %lf \n", ((double)get_time_point() - taken_time)/1000);
+        //  printf("all time thread 2  %lf \n", ((double)get_time_point() - thread_time)/1000);
+
+          *buf_out = img_num;
           pgm_complete(node);
 
         }
@@ -345,6 +354,136 @@ void* thread2(void* _node)
 }
 
 
+void* thread3(void* _node)
+{
+  	char tabbuf[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
+  	int ret = 0;
+    double thread_time = get_time_point();
+
+  	node_t node = *((node_t*)_node);
+    int er = pgm_claim_node1(node);
+    printf("er %d\n", er);
+
+  	tabbuf[node.node] = '\0';
+
+  	int in_degree = pgm_get_degree_in1(node);
+  	edge_t* in_edges = (edge_t*)calloc(in_degree, sizeof(edge_t));
+
+  	int* buf_in;
+
+  	buf_in = (int*)pgm_get_edge_buf_c(in_edges[0]);
+
+
+  	printf("thread3\n");
+
+  	pthread_barrier_wait(&init_barrier);
+
+  	if(!errors)
+  	{
+        double thread2_time_before = get_time_point();
+      //  printf("thread2 time before pgm_wait() %lf milliseconds\n", (thread2_time_before - thread_time)/1000);
+
+  			ret = pgm_wait(node);
+        // double taken_time = get_time_point();
+        // printf("time taken for pgm_wait() %lf\n", (taken_time - thread2_time_before)/1000);
+
+        if(TOTAL_ITERATIONS != 1)
+        {
+
+          double start_time, end_time;
+
+          int img_num = *buf_in;
+          network net = bookkeeping[img_num].net;
+          network_state state = bookkeeping[img_num].state;
+          printf("img num %d\n", img_num);
+
+          static time_benchmark_layers *avg_time_per_layer = NULL;
+          static time_benchmark_layers *sorted_avg_time_per_layer = NULL;
+          int sum = 0;
+
+          if (net.benchmark_layers) {
+              avg_time_per_layer = time_bookkeeping[img_num].avg_time_per_layer;
+              sorted_avg_time_per_layer = time_bookkeeping[img_num].sorted_avg_time_per_layer;
+              sum = time_bookkeeping[img_num].sum;
+              cudaDeviceSynchronize();
+          }
+
+
+          printf("thread 3 %d\n", *buf_in);
+
+          fprintf(stdout, "%s%d fires. read:%d\n", tabbuf, node.node, *buf_in);
+
+                      // slow down the consumer a little bit to induce backlog in token buffer
+
+            for(int i = 30; i < net.n; ++i){
+                state.index = i;
+                layer l = net.layers[i];
+                if(l.delta_gpu && state.train){
+                    fill_ongpu(l.outputs * l.batch, 0, l.delta_gpu, 1);
+                }
+
+                if (net.benchmark_layers) {
+                    start_time = get_time_point();
+                }
+
+                l.forward_gpu(l, state);
+
+                if (net.benchmark_layers) {
+                    CHECK_CUDA(cudaDeviceSynchronize());
+                    end_time = get_time_point();
+                    const double took_time = (end_time - start_time) / 1000;
+                    const double alpha = 0.9;
+                    if (avg_time_per_layer[i].time == 0) {
+                        avg_time_per_layer[i].layer_id = i;
+                        avg_time_per_layer[i].layer_type = l.type;
+                        avg_time_per_layer[i].time = took_time;
+                    }
+                    else avg_time_per_layer[i].time = avg_time_per_layer[i].time * alpha + took_time * (1 - alpha);
+
+                    sorted_avg_time_per_layer[i] = avg_time_per_layer[i];
+                    printf("\n fw-layer %d - type: %d - %lf ms - avg_time %lf ms \n", i, l.type, took_time, avg_time_per_layer[i].time);
+                }
+
+                if(net.wait_stream)
+                    cudaStreamSynchronize(get_cuda_stream());
+                state.input = l.output_gpu;
+            }
+
+            if (net.benchmark_layers) {
+
+                time_data time_benchmark = {avg_time_per_layer, sorted_avg_time_per_layer, sum};
+                time_bookkeeping[1] = time_benchmark;
+                printf("\n\nSorted by time (forward): sum: %d\n", sum);
+                qsort(sorted_avg_time_per_layer, net.n, sizeof(time_benchmark_layers), time_comparator);
+                for (int i = 0; i <= net.n-1; ++i) {
+                      //printf("layer %d - type: %d - avg_time %lf ms \n", avg_time_per_layer[i].layer_id, avg_time_per_layer[i].layer_type, avg_time_per_layer[i].time);
+                    printf("%d - fw-sort-layer %d - type: %d - avg_time %lf ms \n", i, sorted_avg_time_per_layer[i].layer_id, sorted_avg_time_per_layer[i].layer_type, sorted_avg_time_per_layer[i].time);
+                }
+            }
+          TOTAL_ITERATIONS++;
+          // printf("all time thread 2  without pgm_wait %lf \n", ((double)get_time_point() - taken_time)/1000);
+          // printf("all time thread 2  %lf \n", ((double)get_time_point() - thread_time)/1000);
+          pgm_complete(node);
+
+        }
+        else
+        {
+          fprintf(stdout, "%s%d terminates: \n", tabbuf, node.node);
+        }
+
+  	}
+
+
+  	pthread_barrier_wait(&init_barrier);
+
+  	pgm_release_node1(node);
+
+
+  	free(in_edges);
+
+  	pthread_exit(0);
+}
+
 
 void forward_network_gpu(network net, network_state state)
 {
@@ -358,10 +497,10 @@ void forward_network_gpu(network net, network_state state)
     int i;
 
   	graph_t g;
-  	node_t  n0, n1;
-  	edge_t  e0_1;
+  	node_t  n0, n1, n2;
+  	edge_t  e0_1, e1_2;
 
-  	pthread_t t0, t1;
+  	pthread_t t0, t1, t2;
 
   	edge_attr_t ring_attr;
   	memset(&ring_attr, 0, sizeof(ring_attr));
@@ -376,26 +515,30 @@ void forward_network_gpu(network net, network_state state)
 
   	pgm_init_node(&n0, g, "n0");
   	pgm_init_node(&n1, g, "n1");
+    pgm_init_node(&n2, g, "n2");
 
   	pgm_init_edge5(&e0_1, n0, n1, "e0_1", &ring_attr);
-    printf("forward network gpu after initialization  %lf \n", ((double)get_time_point() - time1)/1000);
+    pgm_init_edge5(&e1_2, n1, n2, "e1_2", &ring_attr);
+    //printf("forward network gpu after initialization  %lf \n", ((double)get_time_point() - time1)/1000);
 
 
-  	pthread_barrier_init(&init_barrier, 0, 1);
+  	pthread_barrier_init(&init_barrier, 0, 3);
   	pthread_create(&t0, 0, thread1, &n0);
   	pthread_create(&t1, 0, thread2, &n1);
+    pthread_create(&t2, 0, thread3, &n2);
 
 
     double start_time = get_time_point();
   	pthread_join(t0, 0);
   	pthread_join(t1, 0);
-    printf("forward network gpu after thread join  %lf \n", ((double)get_time_point() - time1)/1000);
+    pthread_join(t2, 0);
+    //printf("forward network gpu after thread join  %lf \n", ((double)get_time_point() - time1)/1000);
 
 
   	pgm_destroy_graph(g);
 
   	pgm_destroy();
-    printf("forward network gpu after destroy  %lf \n", ((double)get_time_point() - time1)/1000);
+    //printf("forward network gpu after destroy  %lf \n", ((double)get_time_point() - time1)/1000);
 
 
 
