@@ -196,7 +196,6 @@ void* thread1(void* _node)
                   time_data time_benchmark = {avg_time_per_layer, sorted_avg_time_per_layer, sum};
                   time_bookkeeping[1] = time_benchmark;
             }
-            bookkeeping[1] = { net, state};
             done = 1;
       			*buf_out = 1;
             //printf("thread1 time %lf milliseconds\n", ((double)get_time_point() - thread_time)/1000 );
@@ -327,7 +326,6 @@ void* thread2(void* _node)
                     printf("%d - fw-sort-layer %d - type: %d - avg_time %lf ms \n", i, sorted_avg_time_per_layer[i].layer_id, sorted_avg_time_per_layer[i].layer_type, sorted_avg_time_per_layer[i].time);
                 }
             }
-            bookkeeping[img_num] = { net, state};
           *buf_out = img_num;
           // printf("all time thread 2  without pgm_wait %lf \n", ((double)get_time_point() - taken_time)/1000);
           // printf("all time thread 2  %lf \n", ((double)get_time_point() - thread_time)/1000);
