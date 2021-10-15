@@ -198,6 +198,8 @@ void* thread1(void* _node)
             }
             done = 1;
       			*buf_out = 1;
+
+            bookkeeping[img_num] = {net, state};
             //printf("thread1 time %lf milliseconds\n", ((double)get_time_point() - thread_time)/1000 );
             pgm_complete(node);
 
@@ -331,6 +333,7 @@ void* thread2(void* _node)
         //  printf("all time thread 2  %lf \n", ((double)get_time_point() - thread_time)/1000);
 
           *buf_out = img_num;
+          bookkeeping[img_num] = {net, state};
           pgm_complete(node);
 
         }
