@@ -348,6 +348,7 @@ void* thread2(void* _node)
   	pgm_release_node1(node);
 
 
+    free(out_edges);
   	free(in_edges);
 
   	pthread_exit(0);
@@ -376,6 +377,7 @@ void* thread3(void* _node)
 
   	printf("thread3\n");
 
+    fprintf(stdout, "%s%d fires. read:%d\n", tabbuf, node.node, *buf_in);
   	pthread_barrier_wait(&init_barrier);
 
   	if(!errors)
