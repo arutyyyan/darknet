@@ -278,7 +278,7 @@ void* thread2(void* _node)
 
           printf("thread 2 %d\n", *buf_in);
 
-          fprintf(stdout, "%s%d fires. read:%d\n", tabbuf, node.node, *buf_in);
+          fprintf(stdout, "%s%d fires. read:%d\n", tabbuf, node.node, img_num);
 
                       // slow down the consumer a little bit to induce backlog in token buffer
 
