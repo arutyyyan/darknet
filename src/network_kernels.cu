@@ -282,7 +282,7 @@ void* thread2(void* _node)
 
                       // slow down the consumer a little bit to induce backlog in token buffer
 
-            for(int i = 15; i < 30; ++i){
+            for(int i = 15; i <= 30; ++i){
                 state.index = i;
                 layer l = net.layers[i];
                 if(l.delta_gpu && state.train){
@@ -415,7 +415,7 @@ void* thread3(void* _node)
 
                       // slow down the consumer a little bit to induce backlog in token buffer
 
-            for(int i = 30; i < net.n; ++i){
+            for(int i = 31; i < net.n; ++i){
                 state.index = i;
                 layer l = net.layers[i];
                 if(l.delta_gpu && state.train){
