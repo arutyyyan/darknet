@@ -110,7 +110,7 @@ void* thread1(void* _node)
   	node_t node = *((node_t*)_node);
 
     int er = pgm_claim_node1(node);
-    printf("%d\n", er);
+    printf("er %d\n", er);
   	tabbuf[node.node] = '\0';
 
   	int out_degree = pgm_get_degree_out1(node);
@@ -223,7 +223,7 @@ void* thread2(void* _node)
 
   	node_t node = *((node_t*)_node);
     int er = pgm_claim_node1(node);
-    printf("%d\n", er);
+    printf("er %d\n", er);
 
   	tabbuf[node.node] = '\0';
 
@@ -241,7 +241,6 @@ void* thread2(void* _node)
 
     buf_out = (int*)pgm_get_edge_buf_p(out_edges[0]);
 
-
   	printf("thread2\n");
 
   	pthread_barrier_wait(&init_barrier);
@@ -253,7 +252,7 @@ void* thread2(void* _node)
 
   			ret = pgm_wait(node);
         double taken_time = get_time_point();
-      //  printf("time taken for pgm_wait() %lf\n", (taken_time - thread2_time_before)/1000);
+        //printf("time taken for pgm_wait() %lf\n", (taken_time - thread2_time_before)/1000);
 
         if(TOTAL_ITERATIONS != 1)
         {
@@ -278,7 +277,7 @@ void* thread2(void* _node)
 
           printf("thread 2 %d\n", *buf_in);
 
-          fprintf(stdout, "%s%d fires. read:%d\n", tabbuf, node.node, img_num);
+          fprintf(stdout, "%s%d fires. read:%d\n", tabbuf, node.node, *buf_in);
 
                       // slow down the consumer a little bit to induce backlog in token buffer
 
@@ -327,11 +326,9 @@ void* thread2(void* _node)
                     printf("%d - fw-sort-layer %d - type: %d - avg_time %lf ms \n", i, sorted_avg_time_per_layer[i].layer_id, sorted_avg_time_per_layer[i].layer_type, sorted_avg_time_per_layer[i].time);
                 }
             }
-          TOTAL_ITERATIONS++;
-        //  printf("all time thread 2  without pgm_wait %lf \n", ((double)get_time_point() - taken_time)/1000);
-        //  printf("all time thread 2  %lf \n", ((double)get_time_point() - thread_time)/1000);
-
           *buf_out = img_num;
+          // printf("all time thread 2  without pgm_wait %lf \n", ((double)get_time_point() - taken_time)/1000);
+          // printf("all time thread 2  %lf \n", ((double)get_time_point() - thread_time)/1000);
           pgm_complete(node);
 
         }
@@ -348,8 +345,8 @@ void* thread2(void* _node)
   	pgm_release_node1(node);
 
 
-    free(out_edges);
   	free(in_edges);
+    free(out_edges);
 
   	pthread_exit(0);
 }
@@ -377,7 +374,6 @@ void* thread3(void* _node)
 
   	printf("thread3\n");
 
-    fprintf(stdout, "%s%d fires. read:%d\n", tabbuf, node.node, *buf_in);
   	pthread_barrier_wait(&init_barrier);
 
   	if(!errors)
@@ -517,30 +513,30 @@ void forward_network_gpu(network net, network_state state)
 
   	pgm_init_node(&n0, g, "n0");
   	pgm_init_node(&n1, g, "n1");
-    pgm_init_node(&n2, g, "n2");
+  	pgm_init_node(&n2, g, "n2");
 
   	pgm_init_edge5(&e0_1, n0, n1, "e0_1", &ring_attr);
     pgm_init_edge5(&e1_2, n1, n2, "e1_2", &ring_attr);
-    //printf("forward network gpu after initialization  %lf \n", ((double)get_time_point() - time1)/1000);
+    printf("forward network gpu after initialization  %lf \n", ((double)get_time_point() - time1)/1000);
 
 
   	pthread_barrier_init(&init_barrier, 0, 3);
   	pthread_create(&t0, 0, thread1, &n0);
   	pthread_create(&t1, 0, thread2, &n1);
-    pthread_create(&t2, 0, thread3, &n2);
+  	pthread_create(&t2, 0, thread3, &n2);
 
 
     double start_time = get_time_point();
   	pthread_join(t0, 0);
   	pthread_join(t1, 0);
-    pthread_join(t2, 0);
-    //printf("forward network gpu after thread join  %lf \n", ((double)get_time_point() - time1)/1000);
+  	pthread_join(t2, 0);
+    printf("forward network gpu after thread join  %lf \n", ((double)get_time_point() - time1)/1000);
 
 
   	pgm_destroy_graph(g);
 
   	pgm_destroy();
-    //printf("forward network gpu after destroy  %lf \n", ((double)get_time_point() - time1)/1000);
+    printf("forward network gpu after destroy  %lf \n", ((double)get_time_point() - time1)/1000);
 
 
 
