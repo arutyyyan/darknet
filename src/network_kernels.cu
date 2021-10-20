@@ -50,10 +50,6 @@ float * get_network_output_gpu_layer(network net, int i);
 float * get_network_delta_gpu_layer(network net, int i);
 float * get_network_output_gpu(network net);
 
-
-
-
-
 typedef struct input_data{
     network net;
     network_state state;
@@ -88,35 +84,20 @@ int time_comparator(const void *pa, const void *pb)
 int errors = 0;
 pthread_barrier_t init_barrier;
 
-__thread char __errstr[80] = {0};
-
-#define CheckError(e) \
-do { int __ret = (e); \
-if(__ret < 0) { \
-    errors++; \
-  	char* errstr = strerror_r(errno, __errstr, sizeof(errstr)); \
-    fprintf(stderr, "%lu: Error %d (%s (%d)) @ %s:%s:%d\n",  \
-    pthread_self(), __ret, errstr, errno, __FILE__, __FUNCTION__, __LINE__); \
-}}while(0)
-
 int TOTAL_ITERATIONS = 0;
 
 void* thread1(void* _node)
 {
-  	char tabbuf[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
-
     double thread_time = get_time_point();
-  	int ret = 0;
+
   	node_t node = *((node_t*)_node);
 
     int er = pgm_claim_node1(node);
     printf("%d\n", er);
-  	tabbuf[node.node] = '\0';
 
   	int out_degree = pgm_get_degree_out1(node);
   	edge_t* out_edges = (edge_t*)calloc(out_degree, sizeof(edge_t));
   	int* buf_out;
-
 
   	buf_out = (int*)pgm_get_edge_buf_p(out_edges[0]);
 
@@ -127,14 +108,7 @@ void* thread1(void* _node)
   	if(!errors)
   	{
       do{
-        if(TOTAL_ITERATIONS && done){
-
-    				fprintf(stdout, "%s%d terminates: sum: %lu\n", tabbuf, node.node);
-            cond = 0;
-    				pgm_terminate(node);
-      }else{
-
-
+        if(!done){
 
             network net = bookkeeping[1].net;
             network_state state = bookkeeping[1].state;
@@ -154,7 +128,6 @@ void* thread1(void* _node)
             }
 
 
-
             for(int i = 0; i < 15; ++i){
                 state.index = i;
                 layer l = net.layers[i];
@@ -164,7 +137,7 @@ void* thread1(void* _node)
 
                 if (net.benchmark_layers) {
                     start_time = get_time_point();
-                    printf("%d\n", start_time);
+                    printf("%lf\n", start_time);
                 }
 
                 l.forward_gpu(l, state);
@@ -203,7 +176,13 @@ void* thread1(void* _node)
             //printf("thread1 time %lf milliseconds\n", ((double)get_time_point() - thread_time)/1000 );
             pgm_complete(node);
 
-        }
+          }
+          if(TOTAL_ITERATIONS && done){
+
+    				fprintf(stdout, "%d terminates \n",node.node);
+            cond = 0;
+    				pgm_terminate(node);
+          }
       }while(cond);
 
   	}
@@ -219,15 +198,11 @@ void* thread1(void* _node)
 
 void* thread2(void* _node)
 {
-  	char tabbuf[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
-  	int ret = 0;
     double thread_time = get_time_point();
 
   	node_t node = *((node_t*)_node);
     int er = pgm_claim_node1(node);
     printf("%d\n", er);
-
-  	tabbuf[node.node] = '\0';
 
   	int in_degree = pgm_get_degree_in1(node);
   	edge_t* in_edges = (edge_t*)calloc(in_degree, sizeof(edge_t));
@@ -240,9 +215,7 @@ void* thread2(void* _node)
     edge_t* out_edges = (edge_t*)calloc(out_degree, sizeof(edge_t));
     int* buf_out;
 
-
     buf_out = (int*)pgm_get_edge_buf_p(out_edges[0]);
-
 
   	printf("thread2\n");
 
@@ -280,7 +253,7 @@ void* thread2(void* _node)
 
           printf("thread 2 %d\n", *buf_in);
 
-          fprintf(stdout, "%s%d fires. read:%d\n", tabbuf, node.node, *buf_in);
+          fprintf(stdout, "%d fires. read:%d\n", node.node, *buf_in);
 
                       // slow down the consumer a little bit to induce backlog in token buffer
 
@@ -359,15 +332,11 @@ void* thread2(void* _node)
 
 void* thread3(void* _node)
 {
-  	char tabbuf[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
-  	int ret = 0;
     double thread_time = get_time_point();
 
   	node_t node = *((node_t*)_node);
     int er = pgm_claim_node1(node);
     printf("er %d\n", er);
-
-  	tabbuf[node.node] = '\0';
 
   	int in_degree = pgm_get_degree_in1(node);
   	edge_t* in_edges = (edge_t*)calloc(in_degree, sizeof(edge_t));
@@ -492,12 +461,11 @@ void forward_network_gpu(network net, network_state state)
 {
     //printf("\n");
     state.workspace = net.workspace;
-    net.benchmark_layers = 0;
+
     double time1 = (double)get_time_point();
 
     input_data temp = {net, state};
     bookkeeping[1] = temp;
-    int i;
 
   	graph_t g;
   	node_t  n0, n1, n2;
