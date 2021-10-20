@@ -108,7 +108,7 @@ void* thread1(void* _node)
   	if(!errors)
   	{
       do{
-        printf("TOTAL IterationS IN THREAD 0 %d AND DONE %d\n", TOTAL_ITERATIONS, done);
+
         if(!done){
 
             network net = bookkeeping[1].net;
@@ -184,6 +184,9 @@ void* thread1(void* _node)
             cond = 0;
     				int term = pgm_terminate(node);
             printf("terminate %d\n", term);
+          }else{
+            printf("TOTAL IterationS IN THREAD 0 %d AND DONE %d\n", TOTAL_ITERATIONS, done);
+            usleep(1000);
           }
       }while(cond);
 
