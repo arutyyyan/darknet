@@ -433,6 +433,7 @@ void* thread3(void* _node)
                 }
             }
           TOTAL_ITERATIONS++;
+          printf("total itera %d\n", TOTAL_ITERATIONS);
           // printf("all time thread 2  without pgm_wait %lf \n", ((double)get_time_point() - taken_time)/1000);
           // printf("all time thread 2  %lf \n", ((double)get_time_point() - thread_time)/1000);
           pgm_complete(node);
