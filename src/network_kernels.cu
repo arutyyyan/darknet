@@ -226,7 +226,7 @@ void* thread2(void* _node)
         double thread2_time_before = get_time_point();
       //  printf("thread2 time before pgm_wait() %lf milliseconds\n", (thread2_time_before - thread_time)/1000);
 
-  			ret = pgm_wait(node);
+  			pgm_wait(node);
         double taken_time = get_time_point();
       //  printf("time taken for pgm_wait() %lf\n", (taken_time - thread2_time_before)/1000);
 
@@ -312,7 +312,7 @@ void* thread2(void* _node)
         }
         else
         {
-          fprintf(stdout, "%s%d terminates: \n", tabbuf, node.node);
+          fprintf(stdout, "%d terminates: \n", node.node);
         }
 
   	}
@@ -355,7 +355,7 @@ void* thread3(void* _node)
         double thread2_time_before = get_time_point();
       //  printf("thread2 time before pgm_wait() %lf milliseconds\n", (thread2_time_before - thread_time)/1000);
 
-  			ret = pgm_wait(node);
+  			pgm_wait(node);
         // double taken_time = get_time_point();
         // printf("time taken for pgm_wait() %lf\n", (taken_time - thread2_time_before)/1000);
 
@@ -383,7 +383,7 @@ void* thread3(void* _node)
 
           printf("thread 3 %d\n", *buf_in);
 
-          fprintf(stdout, "%s%d fires. read:%d\n", tabbuf, node.node, *buf_in);
+          fprintf(stdout, "%d fires. read:%d\n", node.node, *buf_in);
 
                       // slow down the consumer a little bit to induce backlog in token buffer
 
@@ -440,7 +440,7 @@ void* thread3(void* _node)
         }
         else
         {
-          fprintf(stdout, "%s%d terminates: \n", tabbuf, node.node);
+          fprintf(stdout, "%d terminates: \n", node.node);
         }
 
   	}
