@@ -610,7 +610,7 @@ void forward_network_gpu(network net, network_state state)
   	node_t  n0, n1, n2, n3;
   	edge_t  e0_1, e1_2, e2_3;
 
-  	pthread_t t0, t1, t2;
+  	pthread_t t0, t1, t2, t3;
 
   	edge_attr_t ring_attr;
   	memset(&ring_attr, 0, sizeof(ring_attr));
