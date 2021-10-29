@@ -1669,6 +1669,13 @@ pthread_barrier_t init_barrier;
 
 int TOTAL_ITERATIONS = 0;
 
+void print(node_t* head){
+  node_t* temp = head;
+  while(temp != NULL){
+   printf("%d", temp->val);
+   temp = temp->next;
+  }
+}
 void* thread1(void* _node)
 {
     double thread_time = get_time_point();
