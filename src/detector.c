@@ -1786,7 +1786,6 @@ void* thread1(void* _node)
         }
     }while(cond);
 
-  }
 
   pthread_barrier_wait(&init_barrier);
 
