@@ -1603,14 +1603,14 @@ void calc_anchors(char *datacfg, int num_of_clusters, int width, int height, int
     getchar();
 }
 
-typedef struct node_t{
+typedef struct node_{
   int val;
   struct node* next;
-}node_t;
+}node_;
 
 
-node_t *head = NULL;
-node_t *tail = NULL;
+node_ *head = NULL;
+node_ *tail = NULL;
 
 pthread_mutex_t mut;
 #define N 10
@@ -1656,8 +1656,8 @@ int time_comparator(const void *pa, const void *pb)
     else if (diff > 0) return -1;
     return 0;
 }
-node_t *img_head = NULL;
-node_t *img_tail = NULL;
+node_ *img_head = NULL;
+node_ *img_tail = NULL;
 
 //initialization of condition variables and mutex
 pthread_cond_t full = PTHREAD_COND_INITIALIZER;
@@ -2021,8 +2021,8 @@ void* thread3(void* _node)
 
 
 
-        node_t* new_head = NULL;
-        new_head = (node_t*) malloc(sizeof(node_t));
+        node_* new_head = NULL;
+        new_head = (node_*) malloc(sizeof(node_));
         new_head->val = img_num;
 
 
@@ -2212,8 +2212,8 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
             if(current_size == N){
               pthread_cond_wait(&empty, &mut2);
             }
-            node_t* new_tail = NULL;
-            new_tail = (node_t*) malloc(sizeof(node_t));
+            node_* new_tail = NULL;
+            new_tail = (node_*) malloc(sizeof(node_));
             new_tail->val = id++;
 
             if(!img_head){
