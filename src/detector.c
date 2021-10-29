@@ -1898,7 +1898,8 @@ void* thread2(void* _node)
       //  printf("all time thread 2  %lf \n", ((double)get_time_point() - thread_time)/1000);
 
         *buf_out = img_num;
-        bookkeeping[img_num] = {net, state};
+        input_data temp = {net, state};
+        bookkeeping[img_num] = temp;
         pgm_complete(node);
       }while(1);
 
@@ -2035,7 +2036,8 @@ void* thread3(void* _node)
         }
 
         pthread_mutex_unlock(&mut);
-
+        input_data temp = {net, state};
+        bookkeeping[img_num] = temp;
 
 
         TOTAL_ITERATIONS++;
