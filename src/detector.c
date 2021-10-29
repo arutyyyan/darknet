@@ -1764,8 +1764,8 @@ void* thread1(void* _node)
                 time_bookkeeping[1] = time_benchmark;
           }
           *buf_out = img_num;
-
-          bookkeeping[img_num] = {net, state};
+          input_data temp = {net, state};
+          bookkeeping[img_num] = temp;
           //printf("thread1 time %lf milliseconds\n", ((double)get_time_point() - thread_time)/1000 );
           pgm_complete(node);
 
