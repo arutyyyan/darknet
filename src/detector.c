@@ -1603,7 +1603,7 @@ void calc_anchors(char *datacfg, int num_of_clusters, int width, int height, int
     getchar();
 }
 
-typedef struct node{
+typedef struct node_t{
   int val;
   struct node* next;
 }node_t;
