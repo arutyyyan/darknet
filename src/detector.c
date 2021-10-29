@@ -1669,13 +1669,14 @@ pthread_barrier_t init_barrier;
 
 int TOTAL_ITERATIONS = 0;
 
-void print(node_t* head){
-  node_t* temp = head;
+void print(node_* head){
+  node_* temp = head;
   while(temp != NULL){
    printf("%d", temp->val);
    temp = temp->next;
   }
 }
+
 void* thread1(void* _node)
 {
     double thread_time = get_time_point();
@@ -2148,6 +2149,8 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
 
   	pthread_barrier_init(&init_barrier, 0, 3);
 
+    layer l;
+
     while (1) {
         if (filename) {
             count++;
@@ -2170,7 +2173,7 @@ void test_detector(char *datacfg, char *cfgfile, char *weightfile, char *filenam
         if(letter_box) sized = letterbox_image(im, net.w, net.h);
         else sized = resize_image(im, net.w, net.h);
 
-        layer l = net.layers[net.n - 1];
+        l = net.layers[net.n - 1];
         int k;
         for (k = 0; k < net.n; ++k) {
             layer lk = net.layers[k];
